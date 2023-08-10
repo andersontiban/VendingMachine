@@ -75,26 +75,54 @@ public class Solution {
          * @throws IllegalArgumentException if providedChange is less than the cost of the item
          * @throws IllegalArgumentException if the vending machine has insufficient change to vend the item
          */
-        public VendedItem vend(String code, int providedChange) {
+//        public VendedItem vend(String code, int providedChange) {
+//            VendedItem customerItem;
+//            if(inventory.get(code).size() > 0){
+//               int price = inventory.get(code).get(0).cost;
+//               if(price > providedChange){
+//                   throw new IllegalArgumentException("Price greater than provided change");
+//               } else {
+//                   int changeForCustomer = (providedChange - price);
+//                   int difference = providedChange - changeForCustomer;
+//                   if(totalMoney - changeForCustomer >= 0 ){
+//                       totalMoney += difference;
+//                       Item lastItem = inventory.get(code).remove(inventory.get(code).size() - 1);
+//                       customerItem = new VendedItem(lastItem, changeForCustomer);
+//                       return customerItem;
+//                   } else {
+//                       throw new IllegalStateException("not enough funds to give change");
+//                   }
+//               }
+//            } else {
+//                throw new IllegalArgumentException("Item out of stock");
+//            }
+//            return null;
+//        }
+        public VendedItem vend(String code, int providedChange){
             VendedItem customerItem;
-            if(inventory.get(code).size() > 0){
-               int price = inventory.get(code).get(0).cost;
-               if(price > providedChange){
-                   throw new IllegalArgumentException("Price greater than provided change");
-               } else {
-                   int changeForCustomer = (providedChange - price);
-                   int difference = providedChange - changeForCustomer;
-                   if(totalMoney - changeForCustomer >= 0 ){
-                       totalMoney += difference;
-                       Item lastItem = inventory.get(code).remove(inventory.get(code).size() - 1);
-                       customerItem = new VendedItem(lastItem, changeForCustomer);
-                       return customerItem;
-                   }
-               }
-            } else {
-                throw new IllegalArgumentException("Item out of stock");
+            int difference;
+            int changeForCustomer;
+            int itemPrice;
+
+            if(!inventory.containsKey(code) || inventory.get(code).size() == 0){
+                throw new IllegalArgumentException("Item does not exist or is out of stock");
             }
-            return null;
+
+            itemPrice = inventory.get(code).get(0).cost;
+
+            if(itemPrice > providedChange){
+                throw new IllegalArgumentException("Item cost more than what you provided");
+            }
+            changeForCustomer = providedChange - itemPrice;
+            difference = providedChange - changeForCustomer;
+            if(totalMoney - changeForCustomer < 0){
+                throw new IllegalArgumentException("Machine does not have enough funds");
+            }
+            totalMoney += difference;
+            Item lastItem = inventory.get(code).remove(inventory.get(code).size() - 1);
+            customerItem = new VendedItem(lastItem, changeForCustomer);
+            return customerItem;
+
         }
 
         /**
@@ -103,7 +131,10 @@ public class Solution {
          * @throws IllegalArgumentException if the item is not found or is out of stock
          */
         public Item getItem(String code) {
-            throw new IllegalStateException("Implement this!");
+            if(!inventory.containsKey(code) || inventory.get(code).size() == 0){
+                throw new IllegalArgumentException("Item does not exist or is out of the stock");
+            }
+            return inventory.get(code).get(0);
         }
 
         /**
@@ -121,11 +152,11 @@ public class Solution {
         }
 
         public int getItemCost(String code) {
-            if(!inventory.containsKey(code)){
-                return 0;
+            if(!inventory.containsKey(code) || inventory.get(code).size() ==0){
+                throw new IllegalArgumentException("Item is out of stock");
             }
-             int price = inventory.get(code).get(0).cost;
-             return price;
+            int price = inventory.get(code).get(0).cost;
+            return price;
         }
 
         /**
